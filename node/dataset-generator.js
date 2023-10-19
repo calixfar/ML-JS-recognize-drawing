@@ -1,10 +1,13 @@
+const fs = require('fs')
+const { createCanvas } = require('canvas')
+
 const draw = require('../common/draw')
 const constants = require('../common/constants')
-const { createCanvas } = require('canvas')
+const { printProgress } = require('../common/utils')
+
 const canvas = createCanvas(400, 400)
 const ctx = canvas.getContext('2d')
 
-const fs = require('fs')
 
 const fileNames = fs.readdirSync(constants.RAW_DIR)
 const samples = []
@@ -33,11 +36,13 @@ fileNames.forEach((fileName) => {
       paths
     )
 
+    printProgress(id, fileNames.length * 8)
     id++
   }
 })
 
 fs.writeFileSync(constants.SAMPLES, JSON.stringify(samples))
+fs.writeFileSync(constants.SAMPLES_JS, `const samples = ${JSON.stringify(samples)}`)
 
 
 function generateImageFile (outFile, paths) {
