@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Creator</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main>
+    <h1>Data Creator</h1>
+    <form id="initialForm" onsubmit="start(event)">
+      <input type="text" id="user" placeholder="Type your name" />
+      <button type="submit">START</button>
+    </form>
+
+    <section id="sketchPadContainer" style="visibility: hidden;">
+      <div>
+        <span id="instructions"></span>
+        <button id="advanceBtn" onclick="next()">NEXT</button>
+      </div>
+      <div id="sketchPad"></div>
+    </section>
+  </main>
+  <script src="../common/draw.js"></script>
+  <script src="js/sketchPad.js"></script>
+  <script>
+    let index = 0
+    const labels = ['car', 'fish', 'house', 'tree', 'bicycle', 'guitar', 'pencil', 'clock']
+    const data = {
+      user: null,
+      session: new Date().getTime(),
+      drawings: {}
+    }
+
+    const sketchPadInstance = new SketchPad(sketchPad)
+
+    function start (event) {
+      event.preventDefault()
+
+      if (!user.value) {
+        alert('Please type your name')
+
+        return
+      }
+
+      data.user = user.value
+      initialForm.style.display = 'none'
+      sketchPadContainer. style.visibility = 'visible'
+      const label = labels[index]
+      instructions.innerHTML = 'Please draw a ' + label
+    }
+
+    function next() {
+      if (!sketchPadInstance.paths.length) {
+        alert('Draw somenthing first!')
+
+        return
+      }
+      const currentLabel = labels[index]
+      data.drawings[currentLabel] = sketchPadInstance.paths
+      sketchPadInstance.reset()
+
+      index++
+
+      if (index === labels.length) {
+        sketchPad.style.visibility = 'hidden'
+        instructions.innerHTML = 'Thank You'
+        advanceBtn.innerHTML = 'SAVE'
+        advanceBtn.onclick = save
+
+        return
+      }
+      const label = labels[index]
+      instructions.innerHTML = 'Please draw a ' + label
+    }
+
+    function save() {
+      advanceBtn.style.display = 'none'
+      instructions.innerHTML = 'Take your downloaded file along the dataset'
+
+      const element = document.createElement('a')
+      element.setAttribute('href',
+        'data:text/plain;charset=utf-8'+
+        encodeURIComponent(JSON.stringify(data))
+      )
+      element.setAttribute('download', `${data.session}.json`)
+      element.style.display = 'none'
+
+      document.body.appendChild(element)
+      element.click()
+      document.body.removeChild(element)
+    }
+
+  </script>
+</body>
+</html>
